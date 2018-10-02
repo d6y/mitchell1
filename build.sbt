@@ -6,22 +6,11 @@ lazy val root = (project in file(".")).
     )),
     name := "basic",
     scalacOptions ++= lightbendScalacOptions,
-    libraryDependencies ++= cats ++ fs2 ++ scalatest ++ scalacheck
+    libraryDependencies ++= cats 
   )
-
-lazy val scalatest = Seq(
-  "org.scalatest" %% "scalatest" % "3.0.5" % "test"
-)
-
-lazy val scalacheck = Seq(
-  "org.scalacheck" %% "scalacheck" % "1.14.0" % "test"
-)
-
-lazy val fs2 = Seq("co.fs2" %% "fs2-core" % "0.10.6")
 
 lazy val cats = Seq(
   "org.typelevel" %% "cats-core" % "1.4.0",
-  "org.typelevel" %% "cats-effect" % "1.0.0"
 )
 
 // Picked from https://tpolecat.github.io/2017/04/25/scalac-flags.html

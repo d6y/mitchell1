@@ -11,8 +11,8 @@ case class MetaParams(
     mutationRate: Double,
 )
 
-case class Individual(bits: Vector[Boolean])
-case class Population(individuals: Vector[Individual])
+case class Individual(bits: Vector[Boolean]) extends AnyVal
+case class Population(individuals: Vector[Individual]) extends AnyVal
 
 object Population {
   def random(params: MetaParams): Population =

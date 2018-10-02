@@ -43,5 +43,74 @@ Verbose output (flag in the source) shows the details of every generation in eve
 
 ## Optimised run
 
-TODO
+Step 1 is to package the application with `sbt assembly`.
 
+Step 2: check you can run the JAR file, e.g.,:
+
+```
+$ time java -jar target/scala-2.12/basic-assembly-0.1.0-SNAPSHOT.jar
+Run,Generation
+1,30
+2,39
+3,20
+4,12
+5,13
+6,35
+7,47
+8,35
+9,17
+10,21
+11,23
+12,26
+13,33
+14,39
+15,37
+16,16
+17,32
+18,22
+19,24
+20,22
+
+real	0m1.250s
+user	0m2.364s
+sys	0m0.173s
+```
+
+Step 3: assuming you've installed GraalVM, run:
+
+```
+$ native-image -jar target/scala-2.12/basic-assembly-0.1.0-SNAPSHOT.jar
+```
+
+This will take a few minutes, and will give you a file called `basic-assembly-0.1.0-SNAPSHOT`.
+
+Step 4: run the binary
+
+```
+$ time ./basic-assembly-0.1.0-SNAPSHOT
+Run,Generation
+1,17
+2,23
+3,123
+4,30
+5,17
+6,38
+7,26
+8,21
+9,19
+10,36
+11,28
+12,23
+13,46
+14,104
+15,19
+16,38
+17,6
+18,20
+19,20
+20,33
+
+real	0m0.812s
+user	0m0.634s
+sys	0m0.147s
+```

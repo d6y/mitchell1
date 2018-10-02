@@ -41,7 +41,7 @@ object GA {
       pop: Population,
       fitness: PopulationFitness): (Individual, Individual) = {
 
-    // Dtop 1 to remove the initial zero
+    // Drop 1 to remove the initial zero produced by scanLeft
     val accumulated_fitness = fitness.scanLeft(0) { _ + _ }.drop(1)
     val total_fitness = accumulated_fitness.last
 

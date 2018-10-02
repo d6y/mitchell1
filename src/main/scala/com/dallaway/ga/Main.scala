@@ -41,7 +41,8 @@ object GA {
       pop: Population,
       fitness: PopulationFitness): (Individual, Individual) = {
 
-    val accumulated_fitness = fitness.scanLeft(0) { _ + _ }
+    // Dtop 1 to remove the initial zero
+    val accumulated_fitness = fitness.scanLeft(0) { _ + _ }.drop(1)
     val total_fitness = accumulated_fitness.last
 
     val wheel = accumulated_fitness zip pop.individuals
@@ -57,19 +58,38 @@ object GA {
     (select1(), select1())
   }
 
-  def crossover(i1: Individual, i2: Individual): (Individual, Individual) = ???
+  def crossover(mum: Individual, dad: Individual): (Individual, Individual) = {
+    val locus = Random.nextInt(mum.bits.length)
+
+    val mum_bits = mum.bits.splitAt(locus)
+    val dad_bits = dad.bits.splitAt(locus)
+
+    val child1 = Individual(mum_bits._1 ++ dad_bits._2)
+    val child2 = Individual(dad_bits._1 ++ mum_bits._2)
+
+    (child1, child2)
+  }
+
+  def mutator(rate: Double): Individual => Individual =
+    individual =>
+      Individual(
+        individual.bits.map(bit =>
+          if (Random.nextFloat() <= rate) !bit else bit)
+    )
 
   def evolve(
       params: MetaParams,
       pop: Population,
       fitness: PopulationFitness): Population = {
 
+    val mutate = mutator(params.mutationRate)
+
     def create2children(): (Individual, Individual) = {
       val (mum, dad) = select(pop, fitness)
       val (child1, child2) =
         if (Random.nextDouble() <= params.crossoverRate) crossover(mum, dad)
         else (mum, dad)
-      (child1, child2)
+      (mutate(child1), mutate(child2))
     }
 
     // TODO: handle odd popSize
@@ -97,22 +117,29 @@ object Main {
 
     val solved: GA.PopulationFitness => Boolean =
       _.exists(score => score == params.chromosomeLength)
+
+    val verbose = false
+
     @scala.annotation.tailrec
-    def iterate(pop: Population, gen: Int = 0): Population = {
+    def iterate(pop: Population, gen: Int = 0): (Population, Int) = {
       val scores = GA.evaluate(pop, fitness)
 
-      println(s"Generation $gen")
-      (pop.individuals.map(_.show) zip scores).foreach(println)
+      if (verbose) {
+        (pop.individuals.map(_.show) zip scores).foreach(println)
+      }
 
       solved(scores) match {
-        case true => pop
+        case true => (pop, gen)
         case false => iterate(GA.evolve(params, pop, scores), gen + 1)
       }
     }
 
-    val initialPopulation = Population.random(params)
-    val finalPopulation = iterate(initialPopulation)
-    println(finalPopulation)
+    println("Run,Generation")
+    for (run <- 1 to 20) {
+      val initialPopulation = Population.random(params)
+      val (_, gen) = iterate(initialPopulation)
+      println(s"$run,$gen")
+    }
 
   }
 }
